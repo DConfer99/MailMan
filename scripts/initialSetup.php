@@ -9,6 +9,8 @@ if ($db_check == "") { ?>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+    <link rel="icon" href="img/MailMan_Logo.png">
+
     <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
@@ -54,48 +56,53 @@ if ($db_check == "") { ?>
         <!-- SmartWizard html -->
         <div id="smartwizard">
             <ul style="margin-bottom: 80px;">
-                <li><a href="#step-1">Step 1<br /><small>Initial Setup</small></a></li>
-                <li><a href="#step-2">Step 2<br /><small>This is step description</small></a></li>
-                <li><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
-                <li><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
-                <li><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
-                <li><a href="#step-6">Step 6<br /><small>This is step description</small></a></li>
-                <li><a href="#step-7">Step 7<br /><small>This is step description</small></a></li>
-                <li><a href="#step-8">Step 8<br /><small>This is step description</small></a></li>
-                <li><a href="#step-9">Step 9<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Postfix</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-6">Step 6<br /><small>This is step description</small></a></li>
             </ul>
 
             <div>
-                <div id="step-1" class="">
-                    <h3 class="border-bottom border-gray pb-2">Step 1 Content</h3>
-                    This is a test
-                </div>
-                <div id="step-2" class="">
-                    <h3 class="border-bottom border-gray pb-2">Step 2 Content</h3>
-                    <div>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. </div>
-                </div>
-                <div id="step-3" class="">
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                </div>
-                <div id="step-4" class="">
-                    <h3 class="border-bottom border-gray pb-2">Step 4 Content</h3>
-                    <div class="card">
-                        <div class="card-header">My Details</div>
-                        <div class="card-block p-0">
-                          <table class="table">
-                              <tbody>
-                                  <tr> <th>Name:</th> <td>Tim Smith</td> </tr>
-                                  <tr> <th>Email:</th> <td>example@example.com</td> </tr>
-                              </tbody>
-                          </table>
+                <form>
+                    <div id="step-0" class="">
+                        <h3 class="border-bottom border-gray pb-2">Welcome to MailMan</h3>
+                        Welcome to MailMan. The ultimate mail server monitoring untility! This initial setup will step you through the process of setting up your mail server. Please note that <b>you need access to your domain DNS settings and have the password for the root user on this server in order for this software to work!</b>
+                    </div>
+                    <div id="step-1" class="" style="display: none;">
+                        <h3 class="border-bottom border-gray pb-2">Postfix Setup</h3>
+                            <br>
+                            <i>Installed Postfix Version: <?php echo shell_exec("postconf mail_version | cut -c 16-");?></i>
+                    </div>
+                    <div id="step-2" class="" style="display: none;">
+                        <h3 class="border-bottom border-gray pb-2">Step 2 Content</h3>
+                        <div>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. </div>
+                    </div>
+                    <div id="step-3" class="" style="display: none;">
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+                    </div>
+                    <div id="step-4" class="" style="display: none;">
+                        <h3 class="border-bottom border-gray pb-2">Step 4 Content</h3>
+                        <div class="card">
+                            <div class="card-header">My Details</div>
+                            <div class="card-block p-0">
+                            <table class="table">
+                                <tbody>
+                                    <tr> <th>Name:</th> <td>Tim Smith</td> </tr>
+                                    <tr> <th>Email:</th> <td>example@example.com</td> </tr>
+                                </tbody>
+                            </table>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
 
@@ -134,23 +141,23 @@ if ($db_check == "") { ?>
             });
 
             // Toolbar extra buttons
+            
             var btnFinish = $('<button></button>').text('Finish')
                                              .addClass('btn btn-info')
                                              .on('click', function(){ alert('Finish Clicked'); });
             var btnCancel = $('<button></button>').text('Cancel')
                                              .addClass('btn btn-danger')
                                              .on('click', function(){ $('#smartwizard').smartWizard("reset"); });
-
+            
 
             // Smart Wizard
             $('#smartwizard').smartWizard({
                     selected: 0,
                     theme: 'default',
                     transitionEffect:'fade',
-                    showStepURLhash: true,
-                    toolbarSettings: {toolbarPosition: 'both',
-                                      toolbarButtonPosition: 'end',
-                                      toolbarExtraButtons: [btnFinish, btnCancel]
+                    showStepURLhash: false,
+                    toolbarSettings: {toolbarPosition: 'top',
+                                      toolbarButtonPosition: 'end'
                                     }
             });
 

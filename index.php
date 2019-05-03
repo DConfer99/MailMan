@@ -16,6 +16,10 @@ require "scripts/osCheck.php";
 //Will later check for dovecot
 require "scripts/applicationCheck.php";
 
+//Checks to see if the runas.sh script is present on the computer
+//Will later check for the integrety
+require "scripts/runAsCheck.php";
+
 //Runs initial setup if first time running MailMan
 require "scripts/initialSetup.php";
 

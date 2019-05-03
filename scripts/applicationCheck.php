@@ -30,7 +30,6 @@ if (!fnmatch("*www-data root*", $postfix_config_check)) {
     $err->displayError("www-data is not the owner of /etc/postfix/main.cf. Please change it by running: <i>sudo chown www-data:root /etc/postfix/main.cf</i>");
 }
 
-
 //TODO:
 //1: Add Dovecot Support!!!
 ?>
