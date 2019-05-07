@@ -2,35 +2,30 @@
 
 $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
 
-if ($db_check == "") { ?>
+//Checks to see if settings database exists
+if ($db_check == "") {
+    //Sets initial values for the form
+    if (!isset($_POST)) {
+        echo "Hello";
+    } else {
+        $postfix_version = shell_exec("postconf mail_version | cut -c 16-");
+        $apache_version = shell_exec("apache2 -v | grep \"Server version:\" | cut -c 17-");
+        $hostname = shell_exec("hostname");
+    }
 
-<head>
-    <title>MailMan Initial Setup Utility</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="icon" href="img/MailMan_Logo.png">
+?>
 
-    <!-- Include Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-
-    <!-- Include SmartWizard CSS 
-    <link href="../dist/css/smart_wizard.css" rel="stylesheet" type="text/css" />-->
-
-    <link href="../css/smart_wizard_theme_circles.css" rel="stylesheet" type="text/css" />
-
-    <!-- Optional SmartWizard theme 
-    <link href="../dist/css/smart_wizard_theme_arrows.css" rel="stylesheet" type="text/css" />
-    <link href="../dist/css/smart_wizard_theme_dots.css" rel="stylesheet" type="text/css" />-->
-
-</head>
+<?php require "header.php"; ?>
 
 <body>
-        <nav class="navbar navbar-light bg-light">
-            <a class="navbar-brand" href="#">
-                <img src="../img/logo-text.png" width="113" height="30" alt="">
-            </a>
-        </nav>
+        
+    <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#">
+            <img src="../img/logo-text.png" width="113" height="30" alt="">
+        </a>
+    </nav>
+
     <div class="container">
         <!-- External toolbar sample-->
         <div class="row d-flex align-items-center p-3 my-3 text-white-50">
@@ -66,15 +61,22 @@ if ($db_check == "") { ?>
             </ul>
 
             <div>
-                <form>
+                <form method="post" action="">
                     <div id="step-0" class="">
                         <h3 class="border-bottom border-gray pb-2">Welcome to MailMan</h3>
                         Welcome to MailMan. The ultimate mail server monitoring untility! This initial setup will step you through the process of setting up your mail server. Please note that <b>you need access to your domain DNS settings and have the password for the root user on this server in order for this software to work!</b>
                     </div>
                     <div id="step-1" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Postfix Setup</h3>
-                            <br>
-                            <i>Installed Postfix Version: <?php echo shell_exec("postconf mail_version | cut -c 16-");?></i>
+                        <h3 class="border-bottom border-gray pb-2">Postfix Setup</h3><br>
+                            <div class="form-class">
+                                <label for="hostname">Host Name</label>
+                                <input type="text" class="form-control" id="hostname" value="<?php echo $hostname;?>" aria-describedby="hostnameHelpBlock">
+                                <small id="hostnameHelpBlock" class="form-text text-muted">
+                                    This should be the same as your A record pointing to the mail server
+                                </small>
+                                <br>
+                                <i>Installed Postfix Version: <?php echo $postfix_version;?></i>
+                            </div>
                     </div>
                     <div id="step-2" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Step 2 Content</h3>
@@ -99,6 +101,31 @@ if ($db_check == "") { ?>
                                     <tr> <th>Email:</th> <td>example@example.com</td> </tr>
                                 </tbody>
                             </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="step-6" class="" style="display: none;">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rootPasswordModal">
+                            Apply Changes
+                        </button>
+                    </div>
+                    <div class="modal fade" id="rootPasswordModal" tabindex="-1" role="dialog" aria-labelledby="rootPasswordModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Priviledges Required</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    This action requires a root priviledges on this server in order to execute. Please enter the password for the root user.<br><br>
+                                    <input type="password" class="form-control" id="rootPassword" placeholder="Root Password">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                </div>
                             </div>
                         </div>
                     </div>

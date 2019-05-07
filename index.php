@@ -23,4 +23,7 @@ require "scripts/runAsCheck.php";
 //Runs initial setup if first time running MailMan
 require "scripts/initialSetup.php";
 
+//If all checks pass, the dashboard will load
+header("Location: dashboard.php");
+
 ?>
