@@ -12,16 +12,16 @@ require "classes.php";
 //Brings in item to check operating system
 require "scripts/osCheck.php";
 
+//Runs initial setup if first time running MailMan
+require "scripts/initialSetup.php";
+
 //Checks to see if postfix is imstalled
 //Will later check for dovecot
-require "scripts/applicationCheck.php";
+#require "scripts/applicationCheck.php";
 
 //Checks to see if the runas.sh script is present on the computer
 //Will later check for the integrety
-require "scripts/runAsCheck.php";
-
-//Runs initial setup if first time running MailMan
-require "scripts/initialSetup.php";
+#require "scripts/runAsCheck.php";
 
 //If all checks pass, the dashboard will load
 header("Location: dashboard.php");
