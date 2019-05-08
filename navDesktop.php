@@ -9,7 +9,7 @@
                                     <i class="zmdi zmdi-search"></i>
                                 </button>
                             </form> -->
-                            <div class="header-button navbar-text">
+                            <div class="header-button navbar-text" style="position: absolute; right: 10px;">
                                 <div class="noti-wrap">
                                     <div class="noti__item js-item-menu">
                                         <i class="zmdi zmdi-comment-more"></i>
