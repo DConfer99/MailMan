@@ -12,18 +12,20 @@ require "classes.php";
 //Brings in item to check operating system
 require "scripts/osCheck.php";
 
-//Runs initial setup if first time running MailMan
-require "scripts/initialSetup.php";
+//Checks to see if the runas.sh script is present on the computer
+//Will later check for the integrety
+require "scripts/runAsCheck.php";
 
 //Checks to see if postfix is imstalled
 //Will later check for dovecot
-#require "scripts/applicationCheck.php";
+require "scripts/applicationCheck.php";
 
-//Checks to see if the runas.sh script is present on the computer
-//Will later check for the integrety
-#require "scripts/runAsCheck.php";
+//Runs initial setup if first time running MailMan
+require "scripts/initialSetup.php";
 
 //If all checks pass, the dashboard will load
 header("Location: dashboard.php");
 
 ?>
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" integrity="sha384-oS3vJWv+0UjzBfQzYUhtDYW+Pj2yciDJxpsK1OYPAYjqT085Qq/1cq5FLXAZQ7Ay" crossorigin="anonymous">

@@ -1,5 +1,5 @@
 <?php
-
+/*
 //Runs command to see if postfix is installed
 $postfix_check = shell_exec("which postfix");
 
@@ -12,10 +12,10 @@ if ($postfix_check == "") {
 //Looks to see the exsistance and permissions of /etc/postfix/main.cf
 $postfix_config_check = shell_exec("ls -l /etc/postfix/main.cf");
 
-//Halts operationif /etc/postfix/main.cf does not exsist
+//Halts operationif /etc/postfix/main.cf does not exist
 if ($postfix_config_check == "") {
     $err = new fatalError;
-    $err->displayError("Postfix config file does not exsist. Please execute the command: <i>sudo touch /etc/postfix/main.cf</i>");
+    $err->displayError("Postfix config file does not exist. Please execute the command: <i>sudo touch /etc/postfix/main.cf</i>");
 }
 
 //Looks to see if the correct permissions are set on the file
@@ -32,4 +32,22 @@ if (!fnmatch("*www-data root*", $postfix_config_check)) {
 
 //TODO:
 //1: Add Dovecot Support!!!
+*/
+?>
+<?php 
+$packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim", "opendmarc");
+$array_count = 0;
+foreach ($packages as $package) {
+    if(shell_exec("which " . $package) != ""){
+        unset($packages[$array_count]);
+    } 
+$array_count++;
+}
+$packages = array_values($packages);
+
+if( count($packages) != 0 ){
+    require "header.php";
+    echo "hello";
+    die;
+}
 ?>

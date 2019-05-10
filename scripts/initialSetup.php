@@ -1,6 +1,12 @@
 <?php
+if(isset($_GET['submit'])){
+    $rootExec = new rootExec;
+    $rootExec->command("hostnamectl set-hostname " . $_GET['hostname'], $_GET['rootPassword']);
+}
 
 $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
+
+
 
 //Checks to see if settings database exists
 if ($db_check == "") {
@@ -52,8 +58,8 @@ if ($db_check == "") {
         <div id="smartwizard">
             <ul style="margin-bottom: 80px;">
                 <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Postfix</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Package Check</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
@@ -61,34 +67,54 @@ if ($db_check == "") {
             </ul>
 
             <div>
-                <form method="post" action="">
+                <form method="get" action="">
                     <div id="step-0" class="">
                         <h3 class="border-bottom border-gray pb-2">Welcome to MailMan</h3>
                         Welcome to MailMan. The ultimate mail server monitoring untility! This initial setup will step you through the process of setting up your mail server. Please note that <b>you need access to your domain DNS settings and have the password for the root user on this server in order for this software to work!</b>
                     </div>
                     <div id="step-1" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Postfix Setup</h3><br>
+                        <h3 class="border-bottom border-gray pb-2">Set Hostname</h3><br>
                             <div class="form-class">
                                 <label for="hostname">Host Name</label>
-                                <input type="text" class="form-control" id="hostname" value="<?php echo $hostname;?>" aria-describedby="hostnameHelpBlock">
+                                <input type="text" class="form-control" id="hostname" name="hostname" value="<?php echo $hostname;?>" aria-describedby="hostnameHelpBlock">
                                 <small id="hostnameHelpBlock" class="form-text text-muted">
-                                    This should be the same as your A record pointing to the mail server
+                                    This should be your domain name or a subdomain of your domain name. For example, if you want your email address to be "brennan@mailman.com", your host name would be "mailman.com". Or, if you wanted you email address to be "dillon@mail.mailman.com", your host name would be "mail.mailman.com".
                                 </small>
                                 <br>
-                                <i>Installed Postfix Version: <?php echo $postfix_version;?></i>
+                                <!--<i>Installed Postfix Version: <?php #echo $postfix_version;?></i>-->
                             </div>
                     </div>
                     <div id="step-2" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Step 2 Content</h3>
-                        <div>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum. </div>
+                        <h3 class="border-bottom border-gray pb-2">Package Check</h3>
+                        <div>
+                        
+                            <?php 
+                            #use foreach here
+                                $packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim", "opendmarc");
+                                $array_count = 0;
+                                foreach ($packages as $package) {
+
+                                    if(shell_exec("which " . $package) != ""){
+                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $package; ?></i> is installed! <?php
+                                        unset($packages[$array_count]);
+                                    } else {
+                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $package; ?></i> is not installed. <?php
+                                    }
+                                    ?><br /><?php
+                                    $array_count++;
+                                }
+                            $packages = array_values($packages);
+                            ?>
+
+                            <small id="hostnameHelpBlock" class="form-text text-muted">
+                                <br />The missing packages will be installed at the end of this setup process. 
+                            </small>
+                        </div>
                     </div>
                     <div id="step-3" class="" style="display: none;">
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-                        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+                    Woops. Deleted the wrong thing.
+
                     </div>
                     <div id="step-4" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Step 4 Content</h3>
@@ -120,11 +146,11 @@ if ($db_check == "") {
                                 </div>
                                 <div class="modal-body">
                                     This action requires a root priviledges on this server in order to execute. Please enter the password for the root user.<br><br>
-                                    <input type="password" class="form-control" id="rootPassword" placeholder="Root Password">
+                                    <input type="password" class="form-control" id="rootPassword" name="rootPassword" placeholder="Root Password">
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary">Save changes</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Save changes</button>
                                 </div>
                             </div>
                         </div>
