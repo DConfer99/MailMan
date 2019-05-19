@@ -1,3 +1,6 @@
+<?php
+require "classes.php";
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,7 +45,6 @@
         require "navMobile.php";
         ?> 
 
-
         <!-- MENU SIDEBAR-->
         <aside class="menu-sidebar d-none d-lg-block">
             <div class="logo">
@@ -53,12 +55,12 @@
             <div class="menu-sidebar__content js-scrollbar1">
                 <nav class="navbar-sidebar">
                     <ul class="list-unstyled navbar__list">
-                        <li class="active">
-                            <a class="js-arrow" href="#">
+                        <li>
+                            <a class="js-arrow" href="dashboard.php">
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
-                        <li>
-                            <a href="users.php">
+                        <li class="active">
+                            <a href="#">
                                 <i class="fas fa-users"></i>Users</a>
                         </li>
                         <li>
@@ -144,9 +146,78 @@
 
             <!-- MAIN CONTENT-->
             <div class="main-content">
+
+            <?php
+            $rootExec = new rootExec;
+            $hostname = shell_exec("hostname");
+            $users = shell_exec("ls /home");
+            $users = explode("\n",$users);
+            array_pop($users);
+            ?>
+        <form>
+            <div class="row">
+                            <div class="col-lg-9">
+                                <div class="table-responsive table--no-card m-b-30">
+                                    <table class="table table-borderless table-striped table-earning">
+                                        <thead>
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Email Address</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+
+                                            <?php
+                                                foreach ($users as $user) {
+                                                    echo "<tr>";
+                                                    echo "<td>". $user ."</td>";
+                                                    echo "<td>" . $user . "@" . $hostname . "</td>";
+                                                    echo "<td class=\"text-right\"><button type=\"button\" class=\"btn btn-danger\" data-toggle=\"modal\" data-target=\"#rootPasswordModal\"><i class=\"fas fa-user-times\"></i> Delete</button></td>";
+                                                    echo "</tr>";
+                                                }
+                                            ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <input class="au-input au-input--md" type="text" name="new_user" placeholder="Add a new user...">
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#rootPasswordModal"><i class="fas fa-user-plus"></i> Add User</button>
+
+                            </div>
+
             </div>
+
+
+            <div class="modal fade" id="rootPasswordModal" tabindex="-1" role="dialog" aria-labelledby="rootPasswordModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Priviledges Required</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    This action requires a root priviledges on this server in order to execute. Please enter the password for the root user.<br><br>
+                                    <input type="password" class="form-control" id="rootPassword" name="rootPassword" placeholder="Root Password">
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Save changes</button>
+                                </div>
+                            </div>
+                        </div>
+            </div>
+
+
+        </form>
+        
             <!-- END MAIN CONTENT-->
+
+
             <!-- END PAGE CONTAINER-->
+            
         </div>
 
     </div>

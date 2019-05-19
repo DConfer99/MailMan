@@ -1,54 +1,60 @@
 <?php
-//Command to look for expect
-$expect_check = "which expect";
+/*
+//Runs command to see if postfix is installed
+$postfix_check = shell_exec("which postfix");
 
-//Checks to see if expect is installed on the server
-if (shell_exec($expect_check) == "") {
-    $fatalError = new fatalError;
-    $fatalError->displayError("Expect is not installed on your system. Please install it by using the command <i>sudo apt install -y expect</i>");
+//Stops operation if postfix is not installed
+if ($postfix_check == "") {
+    $err = new fatalError;
+    $err->displayError("Postfix is not installed on this server. Please install using the command: \n <i>DEBIAN_FRONTEND=noninteractive apt-get install postfix</i> ");
 }
 
-//command to install missing packages
-$install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim";
+//Looks to see the exsistance and permissions of /etc/postfix/main.cf
+$postfix_config_check = shell_exec("ls -l /etc/postfix/main.cf");
 
-//Runs when modal is activated
-if($_POST['submit'] == "submit"){
-    $root_password = $_POST['rootPassword'];
-    $rootExec = new rootExec;
-    $rootExec->command($install_command, $root_password);
+//Halts operationif /etc/postfix/main.cf does not exist
+if ($postfix_config_check == "") {
+    $err = new fatalError;
+    $err->displayError("Postfix config file does not exist. Please execute the command: <i>sudo touch /etc/postfix/main.cf</i>");
 }
 
-//TODO
-//1: Add error for wrong password
-//2: Add support for sudoers
+//Looks to see if the correct permissions are set on the file
+if (!fnmatch("-rw-r--r--*", $postfix_config_check)) {
+    $err = new fatalError;
+    $err->displayError("Permissions on /etc/postfix/main.cf are not correct. Please change them by running: <i>sudo chmod 622 /etc/postfix/main.cf</i>");
+}
 
-//Command to check and see what packages are installed
-$package_status = shell_exec("apt list postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim");
+//Looks to see if www-data is the owner of /etc/postfix/main.cf
+if (!fnmatch("*www-data root*", $postfix_config_check)) {
+    $err = new fatalError;
+    $err->displayError("www-data is not the owner of /etc/postfix/main.cf. Please change it by running: <i>sudo chown www-data:root /etc/postfix/main.cf</i>");
+}
 
-//Puts list of packages into an array
-$package_array = preg_split('/\n+/', trim($package_status));
+//TODO:
+//1: Add Dovecot Support!!!
+*/
+?>
+<?php 
+$install_command= "apt install -y";
 
-//First element of the array is garbage and does not contain package info
-unset($package_array[0]);
-
-//Counter for the missing packages on the system
-$missing_packages = 0;
-
-//Initialize an empty array for the installed bools
-$package_installed = array();
-
-//Goes through the package_array and determines if the packages are installed
-foreach ($package_array as $package) {
-    if (fnmatch("*installed*", $package)) {
-        array_push($package_installed, 1);
+$packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim");
+$array_count = 0;
+foreach ($packages as $package) {
+    if(shell_exec("which " . $package) != ""){
+        unset($packages[$array_count]);
     } else {
-        array_push($package_installed, 0);
-        $missing_packages++;
+        $install_command=$install_command . " " . $package;
     }
+$array_count++;
 }
+$packages = array_values($packages);
 
-//This code trips and runs if a package is missing
-if( $missing_packages >= 1 ){
+if( count($packages) != 0 ){
+
+    if(isset($_GET['submit'])){
+        $rootExec = new rootExec;
+        $rootExec->command($install_command, $_GET['rootPassword']);
+    }
 
     require "header.php";
     ?>
@@ -60,21 +66,22 @@ if( $missing_packages >= 1 ){
     </nav>
 <div class="container">
     <br />
-    <form action="" method="POST">
+    <form>
                     <div id="step-2" class="" style="disp">
                         <h3 class="border-bottom border-gray pb-2">Package Check</h3>
                         <div>
                         
                             <?php 
                             #use foreach here
-                                $packages = array("certbot", "dovecot-core", "opendkim", "postfix", "postfix-policyd-spf-python", "python3-certbot-apache");
+                                $packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim");
                                 $array_count = 0;
-                                foreach ($package_installed as $status) {
+                                foreach ($packages as $package) {
 
-                                    if($status == 1){
-                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $packages[$array_count]; ?></i> is installed! <?php
+                                    if(shell_exec("which " . $package) != ""){
+                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $package; ?></i> is installed! <?php
+                                        unset($packages[$array_count]);
                                     } else {
-                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $packages[$array_count]; ?></i> is not installed. <?php
+                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $package; ?></i> is not installed. <?php
                                     }
                                     ?><br /><?php
                                     $array_count++;
@@ -103,7 +110,7 @@ if( $missing_packages >= 1 ){
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" name="submit" value="submit">Save changes</button>
+                                    <button type="submit" class="btn btn-primary" name="submit">Save changes</button>
                                 </div>
                             </div>
                         </div>
