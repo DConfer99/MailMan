@@ -8,30 +8,19 @@
             <div class="menu-sidebar__content js-scrollbar1">
                 <nav class="navbar-sidebar">
                     <ul class="list-unstyled navbar__list">
-                        <li class="active">
-                            <a class="js-arrow" href="#">
+                        <li <?php if($_SERVER['PHP_SELF'] == "/dashboard.php") { echo "class=\"active\"";} ?>>
+                            <a class="js-arrow" href="dashboard.php">
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
-                        <li>
+                        <li <?php if($_SERVER['PHP_SELF'] == "/users.php") { echo "class=\"active\"";}?>>
                             <a href="users.php">
                                 <i class="fas fa-users"></i>Users</a>
                         </li>
-                        <li>
+                        <li <?php if($_SERVER['PHP_SELF'] == "/options.php") { echo "class=\"active\"";} ?>>
                             <a href="table.html">
-                                <i class="fas fa-table"></i>Tables</a>
+                                <i class="fas fa-table"></i>Options</a>
                         </li>
-                        <li>
-                            <a href="form.html">
-                                <i class="far fa-check-square"></i>Forms</a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-calendar-alt"></i>Calendar</a>
-                        </li>
-                        <li>
-                            <a href="map.html">
-                                <i class="fas fa-map-marker-alt"></i>Maps</a>
-                        </li>
+                        
                         <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fas fa-copy"></i>Pages</a>

@@ -40,10 +40,11 @@
 
         <?php
         require "navMobile.php";
+        require "sidebar.php";
         ?> 
 
 
-        <!-- MENU SIDEBAR-->
+        <!-- MENU SIDEBAR--><!--
         <aside class="menu-sidebar d-none d-lg-block">
             <div class="logo">
                 <a href="#">
@@ -134,7 +135,7 @@
                     </ul>
                 </nav>
             </div>
-        </aside>
+        </aside>-->
         <!-- END MENU SIDEBAR-->
 
         <!-- PAGE CONTAINER-->
