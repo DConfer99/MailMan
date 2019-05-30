@@ -17,10 +17,10 @@
                                 <i class="fas fa-users"></i>Users</a>
                         </li>
                         <li <?php if($_SERVER['PHP_SELF'] == "/options.php") { echo "class=\"active\"";} ?>>
-                            <a href="table.html">
+                            <a href="options.php">
                                 <i class="fas fa-table"></i>Options</a>
                         </li>
-                        
+                        <!--
                         <li class="has-sub">
                             <a class="js-arrow" href="#">
                                 <i class="fas fa-copy"></i>Pages</a>
@@ -35,7 +35,7 @@
                                     <a href="forget-pass.html">Forget Password</a>
                                 </li>
                             </ul>
-                        </li>
+                        </li>-->
                     </ul>
                 </nav>
             </div>
