@@ -1,17 +1,7 @@
 <?php
-//Things to implement
-//
-//Hostname
-//Imap or pop3
-//Admin User
-
-if(isset($_POST['submit'])){
+if(isset($_GET['submit'])){
     $rootExec = new rootExec;
-    $rootExec->command("hostnamectl set-hostname " . $_POST['hostname'], $_POST['rootPassword']);
-
-    if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
-        $rootExec->command("apt install -y " . $_POST['pop3'] . " " . $_POST['imap'], $_POST['rootPassword']);
-    }
+    $rootExec->command("hostnamectl set-hostname " . $_GET['hostname'], $_GET['rootPassword']);
 }
 
 $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
@@ -26,7 +16,6 @@ if ($db_check == "") {
     } else {
         $postfix_version = shell_exec("postconf mail_version | cut -c 16-");
         $apache_version = shell_exec("apache2 -v | grep \"Server version:\" | cut -c 17-");
-        $hostname = shell_exec("hostname");
     }
 
 
@@ -69,7 +58,7 @@ if ($db_check == "") {
             <ul style="margin-bottom: 80px;">
                 <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Dovecot Method</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Package Check</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
@@ -95,15 +84,39 @@ if ($db_check == "") {
                     <div id="step-2" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Dovecot Method</h3>
                         <div>
-                            Pick which of the following method for Dovecot:<br><br>
-                            <input type="checkbox" name="imap" value="dovecot-imapd">IMAP<br>
-                            <input type="checkbox" name="pop3" value="dovecot-pop3d">POP3
+                        
+                            <?php 
+                            #use foreach here
+                                $packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim", "opendmarc");
+                                $array_count = 0;
+                                foreach ($packages as $package) {
+
+                                    if(shell_exec("which " . $package) != ""){
+                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $package; ?></i> is installed! <?php
+                                        unset($packages[$array_count]);
+                                    } else {
+                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $package; ?></i> is not installed. <?php
+                                    }
+                                    ?><br /><?php
+                                    $array_count++;
+                                }
+                            $packages = array_values($packages);
+                            ?>
+
+                            <small id="hostnameHelpBlock" class="form-text text-muted">
+                                <br />The missing packages will be installed at the end of this setup process. 
+                            </small>
                         </div>
                     </div>
                     <div id="step-3" class="" style="display: none;">
-
-                    Woops. Deleted the wrong thing.
-
+                    <h3 class="border-bottom border-gray pb-2">Set Up SSL</h3>
+                        <div class="form-class">
+                                    <label for="certbot_email">Certbot Email</label>
+                                    <input type="text" class="form-control" id="certbot_email" name="certbot_email" placeholder="you@youremail.com">
+                                    <small id="hostnameHelpBlock" class="form-text text-muted">
+                                        This is the information that will be used to create an SSL public certificate and private key for the purposes of encryption.
+                                    </small>
+                        </div>
                     </div>
                     <div id="step-4" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Step 4 Content</h3>
@@ -128,7 +141,7 @@ if ($db_check == "") {
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Priviledges Required</h5>
+                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Privileges Required</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                     </button>
