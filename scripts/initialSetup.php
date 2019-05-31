@@ -1,7 +1,46 @@
 <?php
-if(isset($_GET['submit'])){
+//Things to implement
+//
+//Hostname
+//Imap or pop3
+//Admin User
+
+$hostname = shell_exec("hostname");
+$hostname = trim($hostname);
+
+
+if(isset($_POST['submit'])){
+    $rootPassword = $_POST['rootPassword'];
+
+    //sets hostname
     $rootExec = new rootExec;
-    $rootExec->command("hostnamectl set-hostname " . $_GET['hostname'], $_GET['rootPassword']);
+    $rootExec->command("hostnamectl set-hostname " . $_POST['hostname'], $rootPassword);
+
+    //installs pop3 or imap
+    if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
+        $rootExec->command("apt install -y " . $_POST['pop3'] . " " . $_POST['imap'], $rootPassword);
+    }
+
+    //creates postfix main configuration file
+    if (!file_exists("/etc/postfix/main.cf")){
+        $rootExec->command("sudo touch /etc/postfix/main.cf", $rootPassword);
+    }
+
+    //configures main configuration file- COME BACK AND FIX THIS STUPID ERROR
+    $main_config="sudo postconf -e 'smtpd_banner = \$myhostname ESMTP \$mail_name (Ubuntu)' 'biff = no' 'append_dot_mydomain = no' 'readme_directory = no' 'compatibility_level = 2' 'smtpd_tls_cert_file=/etc/letsencrypt/live/" . $hostname . "/fullchain.pem' 'smtpd_tls_key_file=/etc/letsencrypt/live/" . $hostname . "/privkey.pem' 'smtpd_tls_security_level=may' 'smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1' 'smtpd_tls_loglevel= 1' 'smtpd_use_tls=yes' 'smtpd_tls_session_cache_database = btree:\${data_directory}/smtpd_scache' 'smtp_tls_security_level = may' 'smtp_tls_loglevel = 1' 'smtp_tls_session_cache_database = btree:\${data_directory}/smtp_scache' 'smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination' 'myhostname = " . $hostname . "' 'alias_maps = hash:/etc/aliases' 'alias_database = hash:/etc/aliases' 'myorigin = /etc/mailname' 'mydestination = \$myhostname, " . $hostname . ", localhost." . $hostname . ", , localhost' 'relayhost =' 'mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128' 'mailbox_size_limit = 0' 'recipient_delimiter = +' 'inet_interfaces = all' 'inet_protocols = all' 'policyd-spf_time_limit = 3600' 'smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, check_policy_service unix:private/policyd-spf' 'milter_default_action = accept' 'milter_protocol = 6' 'smtpd_milters = local:opendkim/opendkim.sock' 'non_smtpd_milters = \$smtpd_milters'";
+    $rootExec->command($main_config, $rootPassword);
+    
+
+    //creates virtualhost file
+    #if (!file_exists("/etc/apache2/sites-available/" . $hostname . ".conf")){
+        #$rootExec->command("sudo touch /etc/apache2/sites-available/" . $hostname . ".conf", $rootPassword);
+    #}
+
+    //adds content to virtualhost file
+    $rootExec->command("printf '<VirtualHost *:80>\\nServerName " . $hostname . "\\nDocumentRoot /var/www/" . $hostname . "\\n</VirtualHost>' > /etc/apache2/sites-available/" . $hostname . ".conf", $rootPassword);
+
+    //attempts to issue certbot certificate
+    $rootExec->command("sudo certbot -n --apache --agree-tos --redirect --hsts --email animator12599@gmail.com -d mail.dillonconfer.com", $rootPassword);
 }
 
 $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
@@ -58,8 +97,8 @@ if ($db_check == "") {
             <ul style="margin-bottom: 80px;">
                 <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Package Check</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Dovecot Method</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>Configure SSL</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-6">Step 6<br /><small>This is step description</small></a></li>
@@ -84,27 +123,11 @@ if ($db_check == "") {
                     <div id="step-2" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Dovecot Method</h3>
                         <div>
-                        
-                            <?php 
-                            #use foreach here
-                                $packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim", "opendmarc");
-                                $array_count = 0;
-                                foreach ($packages as $package) {
-
-                                    if(shell_exec("which " . $package) != ""){
-                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $package; ?></i> is installed! <?php
-                                        unset($packages[$array_count]);
-                                    } else {
-                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $package; ?></i> is not installed. <?php
-                                    }
-                                    ?><br /><?php
-                                    $array_count++;
-                                }
-                            $packages = array_values($packages);
-                            ?>
-
+                            Select email access method for Dovecot:<br>
+                            <input type="checkbox" name="imap" value="dovecot-imapd">IMAP<br>
+                            <input type="checkbox" name="pop3" value="dovecot-pop3d">POP3
                             <small id="hostnameHelpBlock" class="form-text text-muted">
-                                <br />The missing packages will be installed at the end of this setup process. 
+                                This is the method by which users will be able to access their emails. IMAP allows users to simply view emails from the server directly, while POP3 requires users to download new emails before viewing them. We reccommend IMAP if you are unsure.
                             </small>
                         </div>
                     </div>
