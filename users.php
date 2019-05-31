@@ -1,5 +1,31 @@
 <?php
 require "classes.php";
+
+//Looks to see if a form was submitted
+if ($_POST['submit'] != "") {
+
+    if ($_POST['username'] != "" && $_POST['submit'] == "newUser") {
+        //Setting local variables for script
+        $username = $_POST['username'];
+        $password = $_POST['password'];
+        $rootPassword = $_POST['rootPassword'];
+
+        //Command to execute new user command
+        $rootExec = new rootExec;
+        $rootExec->command("useradd -m -p '$(mkpasswd -m sha-512 $password)' -s /bin/bash " . $username, $rootPassword);
+        
+    } else {
+        //This is triggered when a deleted user is selected
+        $username = $_POST['submit'];
+        $rootPassword = $_POST[$username];
+
+        //Removes user from system as well as their home directory
+        $rootExec = new rootExec;
+        $rootExec->command("userdel " . $username, $rootPassword);
+        $rootExec->command("rm -rf /home/" . $username, $rootPassword);
+    }
+    
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,101 +69,8 @@ require "classes.php";
 
         <?php
         require "navMobile.php";
+        require "sidebar.php";
         ?> 
-
-        <!-- MENU SIDEBAR-->
-        <aside class="menu-sidebar d-none d-lg-block">
-            <div class="logo">
-                <a href="#">
-                    <img src="img/logo-text.png" alt="MailMan Logo" />
-                </a>
-            </div>
-            <div class="menu-sidebar__content js-scrollbar1">
-                <nav class="navbar-sidebar">
-                    <ul class="list-unstyled navbar__list">
-                        <li>
-                            <a class="js-arrow" href="dashboard.php">
-                                <i class="fas fa-tachometer-alt"></i>Dashboard</a>
-                        </li>
-                        <li class="active">
-                            <a href="#">
-                                <i class="fas fa-users"></i>Users</a>
-                        </li>
-                        <li>
-                            <a href="table.html">
-                                <i class="fas fa-table"></i>Tables</a>
-                        </li>
-                        <li>
-                            <a href="form.html">
-                                <i class="far fa-check-square"></i>Forms</a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-calendar-alt"></i>Calendar</a>
-                        </li>
-                        <li>
-                            <a href="map.html">
-                                <i class="fas fa-map-marker-alt"></i>Maps</a>
-                        </li>
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-copy"></i>Pages</a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="login.html">Login</a>
-                                </li>
-                                <li>
-                                    <a href="register.html">Register</a>
-                                </li>
-                                <li>
-                                    <a href="forget-pass.html">Forget Password</a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="has-sub">
-                            <a class="js-arrow" href="#">
-                                <i class="fas fa-desktop"></i>UI Elements</a>
-                            <ul class="list-unstyled navbar__sub-list js-sub-list">
-                                <li>
-                                    <a href="button.html">Button</a>
-                                </li>
-                                <li>
-                                    <a href="badge.html">Badges</a>
-                                </li>
-                                <li>
-                                    <a href="tab.html">Tabs</a>
-                                </li>
-                                <li>
-                                    <a href="card.html">Cards</a>
-                                </li>
-                                <li>
-                                    <a href="alert.html">Alerts</a>
-                                </li>
-                                <li>
-                                    <a href="progress-bar.html">Progress Bars</a>
-                                </li>
-                                <li>
-                                    <a href="modal.html">Modals</a>
-                                </li>
-                                <li>
-                                    <a href="switch.html">Switchs</a>
-                                </li>
-                                <li>
-                                    <a href="grid.html">Grids</a>
-                                </li>
-                                <li>
-                                    <a href="fontawesome.html">Fontawesome Icon</a>
-                                </li>
-                                <li>
-                                    <a href="typo.html">Typography</a>
-                                </li>
-                            </ul>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-        </aside>
-        <!-- END MENU SIDEBAR-->
 
         <!-- PAGE CONTAINER-->
         <div class="page-container">
@@ -154,7 +87,7 @@ require "classes.php";
             $users = explode("\n",$users);
             array_pop($users);
             ?>
-        <form>
+        <form action="" method="post">
             <div class="row">
                             <div class="col-lg-9">
                                 <div class="table-responsive table--no-card m-b-30">
@@ -173,41 +106,69 @@ require "classes.php";
                                                     echo "<tr>";
                                                     echo "<td>". $user ."</td>";
                                                     echo "<td>" . $user . "@" . $hostname . "</td>";
-                                                    echo "<td class=\"text-right\"><button type=\"button\" class=\"btn btn-danger\" data-toggle=\"modal\" data-target=\"#rootPasswordModal\"><i class=\"fas fa-user-times\"></i> Delete</button></td>";
+                                                    echo "<td class=\"text-right\"><button type=\"button\" class=\"btn btn-danger\" data-toggle=\"modal\" data-target=\"#$user\" data-value=\"$user\"><i class=\"fas fa-user-times\"></i> Delete</button></td>";
                                                     echo "</tr>";
+                                                    $userLabel = $user . "Label";
+                                                    echo "
+                                            
+                                                        <div class=\"modal fade\" id=\"$user\" tabindex=\"-1\" role=\"dialog\" aria-labelledby=\"$userLabel\" aria-hidden=\"true\">
+                                                                    <div class=\"modal-dialog\" role=\"document\">
+                                                                        <div class=\"modal-content\">
+                                                                            <div class=\"modal-header\">
+                                                                                <h5 class=\"modal-title\" id=\"$userLabel\">Delete User</h5>
+                                                                                <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\">
+                                                                                <span aria-hidden=\"true\">&times;</span>
+                                                                                </button>
+                                                                            </div>
+                                                                            <div class=\"modal-body\">
+                                                                                WARNING! This action will delete the user $user along with their files. This is irreversable. This action requires root privileges on this server in order to execute. Please enter the password for the root user.<br><br>
+                                                                                <input type=\"password\" class=\"form-control\" id=\"rootPassword\" name=\"$user\" placeholder=\"Root Password\">
+                                                                            </div>
+                                                                            <div class=\"modal-footer\">
+                                                                                <button type=\"button\" class=\"btn btn-secondary\" data-dismiss=\"modal\">Close</button>
+                                                                                <button type=\"submit\" class=\"btn btn-primary\" name=\"submit\" value=\"$user\">Save changes</button>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                
+                                                        </div>";
                                                 }
                                             ?>
                                         </tbody>
                                     </table>
                                 </div>
-
-                                <input class="au-input au-input--md" type="text" name="new_user" placeholder="Add a new user...">
+                
+                                <h3>Add A User</h3><br>
+                                <input class="au-input au-input--md" type="text" name="username" placeholder="Username"><br>
+                                <input class="au-input au-input--md" type="password" name="password" placeholder="Password"><br>
+                                <input class="au-input au-input--md" type="password" name="passwordVerify" placeholder="Verify Password">
                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#rootPasswordModal"><i class="fas fa-user-plus"></i> Add User</button>
 
                             </div>
 
             </div>
-
+            
 
             <div class="modal fade" id="rootPasswordModal" tabindex="-1" role="dialog" aria-labelledby="rootPasswordModalLabel" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Priviledges Required</h5>
+                                    <h5 class="modal-title" id="rootPasswordModalLabel">Root Privileges Required</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    This action requires a root priviledges on this server in order to execute. Please enter the password for the root user.<br><br>
+                                    This action requires root privileges on this server in order to execute. Please enter the password for the root user.<br><br>
                                     <input type="password" class="form-control" id="rootPassword" name="rootPassword" placeholder="Root Password">
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-primary" name="submit">Save changes</button>
+                                    <button type="submit" class="btn btn-primary" name="submit" value="newUser">Save changes</button>
                                 </div>
                             </div>
                         </div>
+                    
             </div>
 
 
@@ -232,7 +193,7 @@ require "classes.php";
     </script>
     <script src="vendor/wow/wow.min.js"></script>
     <script src="vendor/animsition/animsition.min.js"></script>
-    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">
+    <script src="vendor/bootstrap-progressbar/bootstrap-progressbar.min.js">class="au-input au-input--md"
     </script>
     <script src="vendor/counter-up/jquery.waypoints.min.js"></script>
     <script src="vendor/counter-up/jquery.counterup.min.js">

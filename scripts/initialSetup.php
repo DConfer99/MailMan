@@ -1,7 +1,17 @@
 <?php
-if(isset($_GET['submit'])){
+//Things to implement
+//
+//Hostname
+//Imap or pop3
+//Admin User
+
+if(isset($_POST['submit'])){
     $rootExec = new rootExec;
-    $rootExec->command("hostnamectl set-hostname " . $_GET['hostname'], $_GET['rootPassword']);
+    $rootExec->command("hostnamectl set-hostname " . $_POST['hostname'], $_POST['rootPassword']);
+
+    if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
+        $rootExec->command("apt install -y " . $_POST['pop3'] . " " . $_POST['imap'], $_POST['rootPassword']);
+    }
 }
 
 $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
@@ -59,7 +69,7 @@ if ($db_check == "") {
             <ul style="margin-bottom: 80px;">
                 <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Package Check</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Dovecot Method</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
@@ -67,7 +77,7 @@ if ($db_check == "") {
             </ul>
 
             <div>
-                <form method="get" action="">
+                <form method="post" action="">
                     <div id="step-0" class="">
                         <h3 class="border-bottom border-gray pb-2">Welcome to MailMan</h3>
                         Welcome to MailMan. The ultimate mail server monitoring untility! This initial setup will step you through the process of setting up your mail server. Please note that <b>you need access to your domain DNS settings and have the password for the root user on this server in order for this software to work!</b>
@@ -80,35 +90,14 @@ if ($db_check == "") {
                                 <small id="hostnameHelpBlock" class="form-text text-muted">
                                     This should be your domain name or a subdomain of your domain name. For example, if you want your email address to be "brennan@mailman.com", your host name would be "mailman.com". Or, if you wanted you email address to be "dillon@mail.mailman.com", your host name would be "mail.mailman.com".
                                 </small>
-                                <br>
-                                <!--<i>Installed Postfix Version: <?php #echo $postfix_version;?></i>-->
                             </div>
                     </div>
                     <div id="step-2" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Package Check</h3>
+                        <h3 class="border-bottom border-gray pb-2">Dovecot Method</h3>
                         <div>
-                        
-                            <?php 
-                            #use foreach here
-                                $packages = array("postfix", "certbot", "python3-certbot-apache", "dovecot-core", "dovecot-imapd", "postfix-policyd-spf-python", "opendkim", "opendmarc");
-                                $array_count = 0;
-                                foreach ($packages as $package) {
-
-                                    if(shell_exec("which " . $package) != ""){
-                                        ?> <i class="fas fa-check-circle" style="color: green;"></i> <i><?php echo $package; ?></i> is installed! <?php
-                                        unset($packages[$array_count]);
-                                    } else {
-                                        ?> <i class="fas fa-times-circle" style="color: red;"></i> <i><?php echo $package; ?></i> is not installed. <?php
-                                    }
-                                    ?><br /><?php
-                                    $array_count++;
-                                }
-                            $packages = array_values($packages);
-                            ?>
-
-                            <small id="hostnameHelpBlock" class="form-text text-muted">
-                                <br />The missing packages will be installed at the end of this setup process. 
-                            </small>
+                            Pick which of the following method for Dovecot:<br><br>
+                            <input type="checkbox" name="imap" value="dovecot-imapd">IMAP<br>
+                            <input type="checkbox" name="pop3" value="dovecot-pop3d">POP3
                         </div>
                     </div>
                     <div id="step-3" class="" style="display: none;">
@@ -145,7 +134,7 @@ if ($db_check == "") {
                                     </button>
                                 </div>
                                 <div class="modal-body">
-                                    This action requires a root priviledges on this server in order to execute. Please enter the password for the root user.<br><br>
+                                    This action requires root privileges on this server in order to execute. Please enter the password for the root user.<br>This command may take a couple of minutes to execute.<br><br>
                                     <input type="password" class="form-control" id="rootPassword" name="rootPassword" placeholder="Root Password">
                                 </div>
                                 <div class="modal-footer">
