@@ -10,6 +10,7 @@
                                 </button>
                             </form> -->
                             <div class="header-button navbar-text" style="position: absolute; right: 10px;">
+                            <!--
                                 <div class="noti-wrap">
                                     <div class="noti__item js-item-menu">
                                         <i class="zmdi zmdi-comment-more"></i>
@@ -122,29 +123,33 @@
                                         </div>
                                     </div>
                                 </div>
+                            -->
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
-                                        <div class="image">
-                                            <img src="images/icon/avatar-01.jpg" alt="John Doe" />
-                                        </div>
+                                        
                                         <div class="content">
-                                            <a class="js-acc-btn" href="#">john doe</a>
+                                            Logged in as: <a class="js-acc-btn" href="#"><?php echo $_SESSION['username']; ?></a>
                                         </div>
                                         <div class="account-dropdown js-dropdown">
                                             <div class="info clearfix">
-                                                <div class="image">
-                                                    <a href="#">
-                                                        <img src="images/icon/avatar-01.jpg" alt="John Doe" />
-                                                    </a>
-                                                </div>
+                                                <!--
                                                 <div class="content">
                                                     <h5 class="name">
-                                                        <a href="#">john doe</a>
+                                                        <a href="#"></a>
                                                     </h5>
-                                                    <span class="email">johndoe@example.com</span>
+                                                    
                                                 </div>
+                                                -->
+                                                <form method="post" action="">
+                                                <div class="account-dropdown__footer">
+                                                    <button class="btn btn-lg btn-danger btn-block btn-signin" type="submit" name="logout" value="logout">
+                                                        <i class="zmdi zmdi-power"></i> Logout</button>
+                                                </div>
+                                                </form>
                                             </div>
+                                            <!--
                                             <div class="account-dropdown__body">
+                                                
                                                 <div class="account-dropdown__item">
                                                     <a href="#">
                                                         <i class="zmdi zmdi-account"></i>Account</a>
@@ -157,11 +162,10 @@
                                                     <a href="#">
                                                         <i class="zmdi zmdi-money-box"></i>Billing</a>
                                                 </div>
+                                                
+                                                
                                             </div>
-                                            <div class="account-dropdown__footer">
-                                                <a href="#">
-                                                    <i class="zmdi zmdi-power"></i>Logout</a>
-                                            </div>
+                                            -->
                                         </div>
                                     </div>
                                 </div>

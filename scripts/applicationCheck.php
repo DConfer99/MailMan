@@ -15,6 +15,8 @@ $install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix certbo
 if($_POST['submit'] == "submit"){
     $root_password = $_POST['rootPassword'];
     $rootExec = new rootExec;
+    $rootExec->command("apt-add-repository ppa:cerbot/cerbot", $root_password);
+    $rootExec->command("apt update", $root_password);
     $rootExec->command($install_command, $root_password);
 }
 

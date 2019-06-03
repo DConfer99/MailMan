@@ -11,6 +11,7 @@ $hostname = trim($hostname);
 
 if(isset($_POST['submit'])){
     $rootPassword = $_POST['rootPassword'];
+    $certbotEmail = $_POST['certbotEmail'];
 
     //sets hostname
     $rootExec = new rootExec;
@@ -19,31 +20,72 @@ if(isset($_POST['submit'])){
     //installs pop3 or imap
     if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
         $rootExec->command("apt install -y " . $_POST['pop3'] . " " . $_POST['imap'], $rootPassword);
+        if ($_POST['pop3'] != "") {
+            $pop3 = "pop3 ";
+        } else {
+            $pop3 = "";
+        }
+        if ($_POST['imap'] != "") {
+            $imap = "imap";
+        } else {
+            $imap = "";
+        }
+
+        $rootExec->command("printf 'protocols = " . $pop3 . $imap . "' >> /etc/dovecot/dovecot.d");
     }
 
     //creates postfix main configuration file
+    /*
     if (!file_exists("/etc/postfix/main.cf")){
-        $rootExec->command("sudo touch /etc/postfix/main.cf", $rootPassword);
+        $rootExec->command("touch /etc/postfix/main.cf", $rootPassword);
     }
 
+    $myhostname = "\$myhostname";
+    $mail_name = "\$mail_name";
+
     //configures main configuration file- COME BACK AND FIX THIS STUPID ERROR
-    $main_config="sudo postconf -e 'smtpd_banner = \$myhostname ESMTP \$mail_name (Ubuntu)' 'biff = no' 'append_dot_mydomain = no' 'readme_directory = no' 'compatibility_level = 2' 'smtpd_tls_cert_file=/etc/letsencrypt/live/" . $hostname . "/fullchain.pem' 'smtpd_tls_key_file=/etc/letsencrypt/live/" . $hostname . "/privkey.pem' 'smtpd_tls_security_level=may' 'smtpd_tls_protocols = !SSLv2, !SSLv3, !TLSv1' 'smtpd_tls_loglevel= 1' 'smtpd_use_tls=yes' 'smtpd_tls_session_cache_database = btree:\${data_directory}/smtpd_scache' 'smtp_tls_security_level = may' 'smtp_tls_loglevel = 1' 'smtp_tls_session_cache_database = btree:\${data_directory}/smtp_scache' 'smtpd_relay_restrictions = permit_mynetworks permit_sasl_authenticated defer_unauth_destination' 'myhostname = " . $hostname . "' 'alias_maps = hash:/etc/aliases' 'alias_database = hash:/etc/aliases' 'myorigin = /etc/mailname' 'mydestination = \$myhostname, " . $hostname . ", localhost." . $hostname . ", , localhost' 'relayhost =' 'mynetworks = 127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128' 'mailbox_size_limit = 0' 'recipient_delimiter = +' 'inet_interfaces = all' 'inet_protocols = all' 'policyd-spf_time_limit = 3600' 'smtpd_recipient_restrictions = permit_mynetworks, permit_sasl_authenticated, reject_unauth_destination, check_policy_service unix:private/policyd-spf' 'milter_default_action = accept' 'milter_protocol = 6' 'smtpd_milters = local:opendkim/opendkim.sock' 'non_smtpd_milters = \$smtpd_milters'";
     $rootExec->command($main_config, $rootPassword);
-    
+    */
 
-    //creates virtualhost file
-    #if (!file_exists("/etc/apache2/sites-available/" . $hostname . ".conf")){
-        #$rootExec->command("sudo touch /etc/apache2/sites-available/" . $hostname . ".conf", $rootPassword);
-    #}
-
-    //adds content to virtualhost file
+    //adds content to virtualhost 1file
     $rootExec->command("printf '<VirtualHost *:80>\\nServerName " . $hostname . "\\nDocumentRoot /var/www/" . $hostname . "\\n</VirtualHost>' > /etc/apache2/sites-available/" . $hostname . ".conf", $rootPassword);
 
     //attempts to issue certbot certificate
-    $rootExec->command("sudo certbot -n --apache --agree-tos --redirect --hsts --email animator12599@gmail.com -d mail.dillonconfer.com", $rootPassword);
+    $rootExec->command("certbot -n --apache --agree-tos --redirect --hsts --email $certbotEmail -d $hostname", $rootPassword);
+
+    //Creating Admin User
+    $admin_username = $_POST['admin_username'];
+    $admin_password = $_POST['admin_password'];
+
+    $salt = substr(strtr(base64_encode(openssl_random_pseudo_bytes(22)), '+', '.'), 0, 22);
+    $hash = crypt($admin_password , '$2y$12$' . $salt);
+
+    //Creates the database file 
+    $db = new SQLite3($_SERVER['DOCUMENT_ROOT'].'/db/mailman.db');
+
+    //Creates the user table in the database
+    $db->query('CREATE TABLE IF NOT EXISTS "users" (
+        "user_id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        "username" TEXT UNIQUE NOT NULL,
+        "password" TEXT NOT NULL
+    )');
+
+    //Creates an permissions table in the database
+    /*
+    $db->query('CREATE TABLE IF NOT EXISTS "permissions" (
+        "user_id" INTEGER NOT NULL,
+        "create_user" 
+    )');*/
+    
+
+    //Inserting the admin user into the database
+    $db->exec('BEGIN');
+    $db->query('INSERT INTO "users" ("username", "password")
+        VALUES ("'. $admin_username .'", "'. $hash .'")');
+    $db->exec('COMMIT');
 }
 
-$db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/settings.db");
+$db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/mailman.db");
 
 
 
@@ -52,6 +94,7 @@ if ($db_check == "") {
     //Sets initial values for the form
     if (!isset($_POST)) {
         echo "Hello";
+        
     } else {
         $postfix_version = shell_exec("postconf mail_version | cut -c 16-");
         $apache_version = shell_exec("apache2 -v | grep \"Server version:\" | cut -c 17-");
@@ -99,7 +142,7 @@ if ($db_check == "") {
                 <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Dovecot Method</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>Configure SSL</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>Register MailMan Administrator</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
                 <li style="margin-bottom: 40px;"><a href="#step-6">Step 6<br /><small>This is step description</small></a></li>
             </ul>
@@ -134,22 +177,22 @@ if ($db_check == "") {
                     <div id="step-3" class="" style="display: none;">
                     <h3 class="border-bottom border-gray pb-2">Set Up SSL</h3>
                         <div class="form-class">
-                                    <label for="certbot_email">Certbot Email</label>
-                                    <input type="text" class="form-control" id="certbot_email" name="certbot_email" placeholder="you@youremail.com">
+                                    <label for="certbotEmail">Certbot Email</label>
+                                    <input type="text" class="form-control" id="certbotEmail" name="certbotEmail" placeholder="you@youremail.com">
                                     <small id="hostnameHelpBlock" class="form-text text-muted">
                                         This is the information that will be used to create an SSL public certificate and private key for the purposes of encryption.
                                     </small>
                         </div>
                     </div>
                     <div id="step-4" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Step 4 Content</h3>
+                        <h3 class="border-bottom border-gray pb-2">Register MailMan Administrator</h3>
                         <div class="card">
-                            <div class="card-header">My Details</div>
+                            <div class="card-header">Admin User for the MailMan Interface</div>
                             <div class="card-block p-0">
                             <table class="table">
                                 <tbody>
-                                    <tr> <th>Name:</th> <td>Tim Smith</td> </tr>
-                                    <tr> <th>Email:</th> <td>example@example.com</td> </tr>
+                                    <tr> <th>Username:</th> <td><input type="text" name="admin_username"></td> </tr>
+                                    <tr> <th>Password:</th> <td><input type="password" name="admin_password"></td> </tr>
                                 </tbody>
                             </table>
                             </div>
@@ -271,4 +314,9 @@ if ($db_check == "") {
     </script>
 </body>
 
-<?php } ?>
+<?php 
+} else {
+    header("Location: ". $_SERVER['DOCUMENT_ROOT'] ."/login.php");
+}
+
+?>

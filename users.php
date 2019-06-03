@@ -1,3 +1,6 @@
+<?php require "session.php"; ?>
+
+
 <?php
 require "classes.php";
 
@@ -80,15 +83,23 @@ if ($_POST['submit'] != "") {
             <!-- MAIN CONTENT-->
             <div class="main-content">
 
-            <?php
-            $rootExec = new rootExec;
-            $hostname = shell_exec("hostname");
-            $users = shell_exec("ls /home");
-            $users = explode("\n",$users);
-            array_pop($users);
-            ?>
-        <form action="" method="post">
-            <div class="row">
+                <div class="col-lg-12">
+                <div class="user-data m-b-30">
+                <h3 class="title-3 m-b-30">
+                    <i class="fas fa-users"></i>Users</h3>
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <td>
+                <?php
+                $rootExec = new rootExec;
+                $hostname = shell_exec("hostname");
+                $users = shell_exec("ls /home");
+                $users = explode("\n",$users);
+                array_pop($users);
+                ?>
+                <form action="" method="post">
+                    <div class="row">
                             <div class="col-lg-9">
                                 <div class="table-responsive table--no-card m-b-30">
                                     <table class="table table-borderless table-striped table-earning">
@@ -141,10 +152,16 @@ if ($_POST['submit'] != "") {
                                 <h3>Add A User</h3><br>
                                 <input class="au-input au-input--md" type="text" name="username" placeholder="Username"><br>
                                 <input class="au-input au-input--md" type="password" name="password" placeholder="Password"><br>
-                                <input class="au-input au-input--md" type="password" name="passwordVerify" placeholder="Verify Password">
+                                <input class="au-input au-input--md" type="password" name="passwordVerify" placeholder="Verify Password"><br><br>
                                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#rootPasswordModal"><i class="fas fa-user-plus"></i> Add User</button>
 
                             </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                        </table>
+                    </div>
+                </div>
 
             </div>
             

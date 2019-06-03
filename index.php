@@ -20,10 +20,15 @@ require "scripts/runAsCheck.php";
 //Will later check for dovecot
 require "scripts/applicationCheck.php";
 
+//Sees if SSL is setup correctly
+/*if (!isset($_SERVER['HTTPS'])) {
+    require "scripts/certbotSetup.php";
+}*/
+
 //Runs initial setup if first time running MailMan
 require "scripts/initialSetup.php";
 
 //If all checks pass, the dashboard will load
-header("Location: dashboard.php");
+header("Location: login.php");
 
 ?>
