@@ -9,7 +9,7 @@ if (shell_exec($expect_check) == "") {
 }
 
 //command to install missing packages
-$install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim";
+$install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim opendkim-tools whois";
 
 //Runs when modal is activated
 if($_POST['submit'] == "submit"){
@@ -25,7 +25,7 @@ if($_POST['submit'] == "submit"){
 //2: Add support for sudoers
 
 //Command to check and see what packages are installed
-$package_status = shell_exec("apt list postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim");
+$package_status = shell_exec("apt list postfix certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim opendkim-tools whois");
 
 //Puts list of packages into an array
 $package_array = preg_split('/\n+/', trim($package_status));
@@ -69,7 +69,7 @@ if( $missing_packages >= 1 ){
                         
                             <?php 
                             #use foreach here
-                                $packages = array("certbot", "dovecot-core", "opendkim", "postfix", "postfix-policyd-spf-python", "python3-certbot-apache");
+                                $packages = array("certbot", "dovecot-core", "opendkim", "opendkim-tools", "postfix", "postfix-policyd-spf-python", "python3-certbot-apache", "whois");
                                 $array_count = 0;
                                 foreach ($package_installed as $status) {
 

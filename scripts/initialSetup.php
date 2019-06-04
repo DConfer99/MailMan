@@ -94,13 +94,11 @@ if ($db_check == "") {
 $pub_ip_add = shell_exec("dig +short myip.opendns.com @resolver1.opendns.com");
 $pub_ip_add = trim($pub_ip_add);
 
-$opendkim_key_1 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'k='");
-explode('(', $opendkim_key_1);
+$opendkim_key_1 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'k=' | cut -d '(' -f 2");
 
 $opendkim_key_2 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'p='");
 
-$opendkim_key_3 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'key default'");
-explode(')', $opendkim_key_3);
+$opendkim_key_3 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'key default' | cut -d ')' -f 1");
 ?>
 
 <?php require "header.php"; ?>
@@ -217,7 +215,7 @@ explode(')', $opendkim_key_3);
                                         <td id="dns_host">default_domainkey.<?php echo $hostname; ?></td>
                                         <td>TXT</td>
                                         <td>1h</td>
-                                        <td>"<?php echo $opendkim_key_1[1] . "\" \"" . $opendkim_key_2 . "\" \"" . $opendkim_key_3[0]; ?> "</td>
+                                        <td style="max-width: 50px;"><?php echo $opendkim_key_1 . $opendkim_key_2 . $opendkim_key_3; ?></td>
                                     </tr>
                                 </tbody>
                             </table>

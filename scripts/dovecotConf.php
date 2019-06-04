@@ -98,6 +98,7 @@ namespace inbox {
     $tempRoot->command("mv /var/www/html/scripts/dovecotInit /etc/dovecot/conf.d/15-mailboxes.conf", $rootPassword);
     $tempRoot->command("chown root:root /etc/dovecot/conf.d/15-mailboxes.conf", $rootPassword);
     $tempRoot->command("chmod 644 /etc/dovecot/conf.d/15-mailboxes.conf", $rootPassword);
+    $tempRoot->command("adduser dovecot mail", $rootPassword);
     $tempRoot->command("systemctl restart dovecot", $rootPassword);
 }
 

@@ -7,24 +7,18 @@ if ($_POST['submit'] == "submit") {
     $new_hostname = $_POST['hostname'];
     $certbotEmail = $_POST['certbotEmail'];
 
-    //Sets VirtualHost file and sets up apache
     $rootExec = new rootExec;
-    $rootExec->command("hostnamectl set-hostname " . $new_hostname, $rootPassword);
-    $rootExec->command("printf '<VirtualHost *:80>\\nServerName " . $new_hostname . "\\nDocumentRoot " . $_SERVER['DOCUMENT_ROOT'] . "\\n</VirtualHost>' > /etc/apache2/sites-available/" . $new_hostname . ".conf", $rootPassword);
-    $rootExec->command("a2ensite $new_hostname", $rootPassword);
-    $rootExec->command("a2dissite 000-default.conf", $rootPassword);
-    $rootExec->command("systemctl reload apache2", $rootPassword);
-    $rootExec->command("certbot -n --apache --agree-tos --redirect --hsts --email $certbotEmail -d $new_hostname", $rootPassword);
-    $rootExec->command("systemctl reload apache2", $rootPassword);
 
     //Sets values for 10-ssl.conf values
-    $rootExec->command("sed -i '/ssl =/c\ssl = required' /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
-    $rootExec->command("sed -i '/ssl_cert =/c\ssl_cert = </etc/letsencrypt/live/$hostname/fullchain.pem' /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
-    $rootExec->command("sed -i '/ssl_key =/c\ssl_key = </etc/letsencrypt/live/$hostname/privkey.pem' /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl = required' > /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_cert = </etc/letsencrypt/live/$hostname/fullchain.pem' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_key = </etc/letsencrypt/live/$hostname/privkey.pem' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_client_ca_dir = /etc/ssl/certs' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
 
     //Sets values for 10-auth.conf
-    $rootExec->command("sed -i '/auth_mechanisms =/c\auth_mechanisms = plain login' /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
+    $rootExec->command("printf 'auth_mechanisms = plain login' > /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
     $rootExec->command("printf 'disable_plaintext_auth = yes' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
+    $rootExec->command("printf '!include auth-system.conf.ext' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
 
     //Setting values for 10-master.conf
     require "scripts/10-master.conf.php";
@@ -42,9 +36,19 @@ if ($_POST['submit'] == "submit") {
     require "scripts/opendkimConf.php";
     opendkimConf($hostname, $rootPassword);
 
+    //Restarting all of the mail services
     $rootExec->command("systemctl restart postfix", $rootPassword);
     $rootExec->command("systemctl restart dovecot", $rootPassword);
     $rootExec->command("systemctl restart opendkim", $rootPassword);
+
+    //Sets VirtualHost file and sets up apache
+    $rootExec->command("hostnamectl set-hostname " . $new_hostname, $rootPassword);
+    $rootExec->command("printf '<VirtualHost *:80>\\nServerName " . $new_hostname . "\\nDocumentRoot " . $_SERVER['DOCUMENT_ROOT'] . "\\n</VirtualHost>' > /etc/apache2/sites-available/" . $new_hostname . ".conf", $rootPassword);
+    $rootExec->command("a2ensite $new_hostname", $rootPassword);
+    $rootExec->command("a2dissite 000-default.conf", $rootPassword);
+    $rootExec->command("systemctl reload apache2", $rootPassword);
+    $rootExec->command("certbot -n --apache --agree-tos --redirect --hsts --email $certbotEmail -d $new_hostname", $rootPassword);
+    $rootExec->command("systemctl reload apache2", $rootPassword);
 
     header("Location: http://$new_hostname");
 }
