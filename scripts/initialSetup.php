@@ -11,11 +11,8 @@ $hostname = trim($hostname);
 
 if(isset($_POST['submit'])){
     $rootPassword = $_POST['rootPassword'];
-    $certbotEmail = $_POST['certbotEmail'];
 
-    //sets hostname
     $rootExec = new rootExec;
-    $rootExec->command("hostnamectl set-hostname " . $_POST['hostname'], $rootPassword);
 
     //installs pop3 or imap
     if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
@@ -46,12 +43,6 @@ if(isset($_POST['submit'])){
     //configures main configuration file- COME BACK AND FIX THIS STUPID ERROR
     $rootExec->command($main_config, $rootPassword);
     */
-
-    //adds content to virtualhost 1file
-    $rootExec->command("printf '<VirtualHost *:80>\\nServerName " . $hostname . "\\nDocumentRoot /var/www/" . $hostname . "\\n</VirtualHost>' > /etc/apache2/sites-available/" . $hostname . ".conf", $rootPassword);
-
-    //attempts to issue certbot certificate
-    $rootExec->command("certbot -n --apache --agree-tos --redirect --hsts --email $certbotEmail -d $hostname", $rootPassword);
 
     //Creating Admin User
     $admin_username = $_POST['admin_username'];
@@ -93,14 +84,23 @@ $db_check = shell_exec("ls ".$_SERVER["DOCUMENT_ROOT"]."/db/mailman.db");
 if ($db_check == "") {
     //Sets initial values for the form
     if (!isset($_POST)) {
-        echo "Hello";
+        
         
     } else {
         $postfix_version = shell_exec("postconf mail_version | cut -c 16-");
         $apache_version = shell_exec("apache2 -v | grep \"Server version:\" | cut -c 17-");
     }
+//Looks to DNS server to get public IP
+$pub_ip_add = shell_exec("dig +short myip.opendns.com @resolver1.opendns.com");
+$pub_ip_add = trim($pub_ip_add);
 
+$opendkim_key_1 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'k='");
+explode('(', $opendkim_key_1);
 
+$opendkim_key_2 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'p='");
+
+$opendkim_key_3 = shell_exec("cat /etc/opendkim/keys/$hostname/default.txt | grep 'key default'");
+explode(')', $opendkim_key_3);
 ?>
 
 <?php require "header.php"; ?>
@@ -139,12 +139,10 @@ if ($db_check == "") {
         <div id="smartwizard">
             <ul style="margin-bottom: 80px;">
                 <li style="margin-bottom: 40px;"><a href="#step-0">Welcome<br /><small>Welcome Screen</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Set Hostname</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Dovecot Method</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>Configure SSL</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>Register MailMan Administrator</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-5">Step 5<br /><small>This is step description</small></a></li>
-                <li style="margin-bottom: 40px;"><a href="#step-6">Step 6<br /><small>This is step description</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-1">Step 1<br /><small>Dovecot Method</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-2">Step 2<br /><small>Register MailMan Administrator</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-3">Step 3<br /><small>DNS Information</small></a></li>
+                <li style="margin-bottom: 40px;"><a href="#step-4">Step 4<br /><small>Confirm Changes</small></a></li>
             </ul>
 
             <div>
@@ -154,16 +152,6 @@ if ($db_check == "") {
                         Welcome to MailMan. The ultimate mail server monitoring untility! This initial setup will step you through the process of setting up your mail server. Please note that <b>you need access to your domain DNS settings and have the password for the root user on this server in order for this software to work!</b>
                     </div>
                     <div id="step-1" class="" style="display: none;">
-                        <h3 class="border-bottom border-gray pb-2">Set Hostname</h3><br>
-                            <div class="form-class">
-                                <label for="hostname">Host Name</label>
-                                <input type="text" class="form-control" id="hostname" name="hostname" value="<?php echo $hostname;?>" aria-describedby="hostnameHelpBlock">
-                                <small id="hostnameHelpBlock" class="form-text text-muted">
-                                    This should be your domain name or a subdomain of your domain name. For example, if you want your email address to be "brennan@mailman.com", your host name would be "mailman.com". Or, if you wanted you email address to be "dillon@mail.mailman.com", your host name would be "mail.mailman.com".
-                                </small>
-                            </div>
-                    </div>
-                    <div id="step-2" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Dovecot Method</h3>
                         <div>
                             Select email access method for Dovecot:<br>
@@ -174,17 +162,7 @@ if ($db_check == "") {
                             </small>
                         </div>
                     </div>
-                    <div id="step-3" class="" style="display: none;">
-                    <h3 class="border-bottom border-gray pb-2">Set Up SSL</h3>
-                        <div class="form-class">
-                                    <label for="certbotEmail">Certbot Email</label>
-                                    <input type="text" class="form-control" id="certbotEmail" name="certbotEmail" placeholder="you@youremail.com">
-                                    <small id="hostnameHelpBlock" class="form-text text-muted">
-                                        This is the information that will be used to create an SSL public certificate and private key for the purposes of encryption.
-                                    </small>
-                        </div>
-                    </div>
-                    <div id="step-4" class="" style="display: none;">
+                    <div id="step-2" class="" style="display: none;">
                         <h3 class="border-bottom border-gray pb-2">Register MailMan Administrator</h3>
                         <div class="card">
                             <div class="card-header">Admin User for the MailMan Interface</div>
@@ -198,7 +176,57 @@ if ($db_check == "") {
                             </div>
                         </div>
                     </div>
-                    <div id="step-6" class="" style="display: none;">
+                    <div id="step-3" class="" style="display: none;">
+                        <h3 class="border-bottom border-gray pb-2">DNS Information</h3>
+                        <label for="certbotEmail">Email for Notifications</label>
+                        <input type="text" class="form-control" id="certbotEmail" name="certbotEmail" placeholder="you@youremail.com" onkeyup="myEmail();"><br>
+                        <div class="card">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>Name</td>
+                                        <td>Type</td>
+                                        <td>TTL</td>
+                                        <td>Data</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="dns_host"><?php echo $hostname; ?></td>
+                                        <td>A</td>
+                                        <td>1h</td>
+                                        <td><?php echo $pub_ip_add; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td id="dns_host"><?php echo $hostname; ?></td>
+                                        <td>MX</td>
+                                        <td>1h</td>
+                                        <td>10 <?php echo $hostname; ?></td>
+                                    </tr>
+                                    <tr>
+                                        <td id="dns_host"><?php echo $hostname; ?></td>
+                                        <td>TXT</td>
+                                        <td>1h</td>
+                                        <td>"v=spf1 ip4:<?php echo $pub_ip_add; ?> mx -all"</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="dns_host">_dmarc.<?php echo $hostname; ?></td>
+                                        <td>TXT</td>
+                                        <td>1h</td>
+                                        <td>"v=DMARC1; p=reject; pct=100; fo=1; <br> rua=mailto:<span id="dnsEmail"><span> "</td>
+                                    </tr>
+                                    <tr>
+                                        <td id="dns_host">default_domainkey.<?php echo $hostname; ?></td>
+                                        <td>TXT</td>
+                                        <td>1h</td>
+                                        <td>"<?php echo $opendkim_key_1[1] . "\" \"" . $opendkim_key_2 . "\" \"" . $opendkim_key_3[0]; ?> "</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div><br>
+                        <small id="hostnameHelpBlock" class="form-text text-muted">
+                            Enter the following information in your DNS records. <b style="color: red;">Note that this process may take up to an hour to take effect and must be applied before continuing!</b> <br>
+                        </small><br>
+                    </div>
+                    <div id="step-4" class="" style="display: none;">
                         <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rootPasswordModal">
                             Apply Changes
                         </button>
@@ -246,6 +274,13 @@ if ($db_check == "") {
     <script type="text/javascript" src="../js/jquery.smartWizard.min.js"></script>
 
     <script type="text/javascript">
+
+        function myEmail() {
+        var x = document.getElementById("certbotEmail");
+        document.getElementById("dnsEmail").innerHTML = x.value.concat(" \"");
+        //document.getElementById("message_host").innerHTML = x.value;
+        }
+
         $(document).ready(function(){
 
             // Step show event

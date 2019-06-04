@@ -113,6 +113,7 @@ InternalHosts /etc/opendkim/trusted.hosts";
     $tempRoot->command("mkdir /etc/opendkim/keys", $rootPassword);
     $tempRoot->command("chown -R opendkim:opendkim /etc/opendkim", $rootPassword);
     $tempRoot->command("chmod go-rw /etc/opendkim/keys", $rootPassword);
+    $tempRoot->command("chmod 644 /etx/opendkim/keys/$hostname/default.txt", $rootPassword);
     $tempRoot->command("printf '*@$hostname    default._domainkey.$hostname' > /etc/opendkim/signing.table", $rootPassword);
     $tempRoot->command("printf 'default._domainkey.$hostname     $hostname:default:/etc/opendkim/keys/$hostname/default.private' > /etc/opendkim/key.table", $rootPassword);
     $tempRoot->command("printf '127.0.0.1 \\nlocalhost \\n*.$hostname' > /etc/opendkim/trusted.hosts", $rootPassword);
