@@ -16,7 +16,7 @@ if(isset($_POST['submit'])){
 
     //installs pop3 or imap
     if ($_POST['pop3'] != "" || $_POST['imap'] != "") {
-        $rootExec->command("apt install -y " . $_POST['pop3'] . " " . $_POST['imap'], $rootPassword);
+        $rootExec->command("apt install -y " . $_POST['pop3'] . $_POST['imap'], $rootPassword);
         if ($_POST['pop3'] != "") {
             $pop3 = "pop3 ";
         } else {
@@ -28,7 +28,7 @@ if(isset($_POST['submit'])){
             $imap = "";
         }
 
-        $rootExec->command("printf 'protocols = " . $pop3 . $imap . "' >> /etc/dovecot/dovecot.d");
+        $rootExec->command("printf 'protocols = " . $pop3 . $imap . "\\n' >> /etc/dovecot/dovecot.d");
     }
 
     //creates postfix main configuration file

@@ -10,15 +10,15 @@ if ($_POST['submit'] == "submit") {
     $rootExec = new rootExec;
 
     //Sets values for 10-ssl.conf values
-    $rootExec->command("printf 'ssl = required' > /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
-    $rootExec->command("printf 'ssl_cert = </etc/letsencrypt/live/$hostname/fullchain.pem' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
-    $rootExec->command("printf 'ssl_key = </etc/letsencrypt/live/$hostname/privkey.pem' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
-    $rootExec->command("printf 'ssl_client_ca_dir = /etc/ssl/certs' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl = required\\n' > /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_cert = </etc/letsencrypt/live/$hostname/fullchain.pem\\n' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_key = </etc/letsencrypt/live/$hostname/privkey.pem\\n' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
+    $rootExec->command("printf 'ssl_client_ca_dir = /etc/ssl/certs\\n' >> /etc/dovecot/conf.d/10-ssl.conf", $rootPassword);
 
     //Sets values for 10-auth.conf
-    $rootExec->command("printf 'auth_mechanisms = plain login' > /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
-    $rootExec->command("printf 'disable_plaintext_auth = yes' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
-    $rootExec->command("printf '!include auth-system.conf.ext' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
+    $rootExec->command("printf 'auth_mechanisms = plain login\\n' > /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
+    $rootExec->command("printf 'disable_plaintext_auth = yes\\n' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
+    $rootExec->command("printf '!include auth-system.conf.ext\\n' >> /etc/dovecot/conf.d/10-auth.conf", $rootPassword);
 
     //Setting values for 10-master.conf
     require "scripts/10-master.conf.php";
