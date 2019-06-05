@@ -26,7 +26,7 @@ if(isset($_POST['submit'])){
         } else {
             $imap = "";
         }
-        $rootExec->command("apt install -y " . $pop3 . $imap, $rootPassword);
+        //$rootExec->command("apt install -y " . $pop3 . $imap, $rootPassword);
         $rootExec->command("printf 'protocols = " . $pop3 . $imap . "\\n' >> /etc/dovecot/dovecot.d");
     }
 

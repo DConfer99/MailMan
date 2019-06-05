@@ -9,7 +9,7 @@ if (shell_exec($expect_check) == "") {
 }
 
 //command to install missing packages
-$install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix; apt install -y certbot python3-certbot-apache dovecot-core postfix-policyd-spf-python opendkim opendkim-tools whois";
+$install_command = "DEBIAN_FRONTEND=noninteractive apt install -y postfix; apt install -y certbot python3-certbot-apache dovecot-core dovecot-imapd postfix-policyd-spf-python opendkim opendkim-tools whois";
 
 //Runs when modal is activated
 if($_POST['submit'] == "submit"){
